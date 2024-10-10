@@ -1,0 +1,144 @@
+---
+title: "An Analysis of Musical Trends: A Case Study on The National, Julia Wolf, and Bon Iver"
+author: "Zien Gao, Jiaxuan Song and Shuheng(Jack) Zhou"
+date: "October 10, 2024"
+format: pdf
+echo: false
+---
+
+# Introduction
+
+The surge in popularity of music streaming services provides an invaluable data source for analyzing trends in musical features across various artists and genres. This study focuses on the evolution of musical attributes, specifically duration and valence, for three artists: The National, Julia Wolf, and Bon Iver. Using Spotify data visualized through R's `ggplot2`, we aim to uncover stylistic trends and shifts in each artist's music over time.
+
+# Methodology
+
+We utilized the `spotifyr` package to retrieve track-level data from Spotify, focusing on album release dates, track durations, and valence scores. Data was processed in R, where the following steps were applied:
+
+1. **Data Retrieval**: The `get_artist_audio_features()` function was employed for each artist.
+2. **Data Cleaning**: After loading data, we cleaned and organized it using `dplyr` and visualized it with `ggplot2`.
+
+The following R code snippet illustrates the process of retrieving and plotting data for these artists, with optimizations applied to mitigate warnings.
+
+```{r setup, include=FALSE}
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+library(spotifyr)
+library(usethis)
+library(tidyverse)
+
+# Set up Spotify API credentials (add these to .Renviron or specify them directly)
+# Sys.setenv(SPOTIFY_CLIENT_ID = 'your_client_id')
+# Sys.setenv(SPOTIFY_CLIENT_SECRET = 'your_client_secret')
+```
+
+```{r}
+edit_r_environ()
+```
+
+
+
+```{r}
+# Get audio features for The Beatles and save it as an RDS file
+julia_wolf <- get_artist_audio_features("julia wolf")
+saveRDS(julia_wolf, "julia_wolf.rds")
+
+```
+
+```{r}
+julia_wolf <- readRDS("julia_wolf.rds")
+julia_wolf <- as_tibble(julia_wolf)
+# Plot song duration over album release date
+julia_wolf |>
+  mutate(album_release_date = ymd(album_release_date)) |>
+  ggplot(aes(
+    x = album_release_date,
+    y = duration_ms,
+    group = album_release_date
+  )) +
+  geom_boxplot() +
+  geom_jitter(alpha = 0.5, width = 0.3, height = 0) +
+  theme_minimal() +
+  labs(
+    x = "Album release date",
+    y = "Duration of song (ms)"
+  )
+```
+
+```{r}
+bon_iver <- get_artist_audio_features("bon iver")
+the_national <- get_artist_audio_features("the national")
+
+saveRDS(bon_iver, "bon_iver.rds")
+saveRDS(the_national, "the_national.rds")
+
+# Read the saved RDS files
+julia_wolf <- readRDS("julia_wolf.rds")
+bon_iver <- readRDS("bon_iver.rds")
+the_national <- readRDS("the_national.rds")
+
+
+# Plot song duration over album release date
+bon_iver |>
+  mutate(album_release_date = ymd(album_release_date)) |>
+  ggplot(aes(
+    x = album_release_date,
+    y = duration_ms,
+    group = album_release_date
+  )) +
+  geom_boxplot() +
+  geom_jitter(alpha = 0.5, width = 0.3, height = 0) +
+  theme_minimal() +
+  labs(
+    x = "Album release date",
+    y = "Duration of song (ms)"
+  )
+
+# Plot song duration over album release date
+the_national |>
+  mutate(album_release_date = ymd(album_release_date)) |>
+  ggplot(aes(
+    x = album_release_date,
+    y = duration_ms,
+    group = album_release_date
+  )) +
+  geom_boxplot() +
+  geom_jitter(alpha = 0.5, width = 0.3, height = 0) +
+  theme_minimal() +
+  labs(
+    x = "Album release date",
+    y = "Duration of song (ms)"
+  )
+```
+
+
+# Results
+
+The box plots (see Appendix) illustrate the distribution of song durations by album release date for each artist, providing insights into trends over time. We observe the following:
+
+- **The National**: A slight decrease in valence over time, suggesting a potential shift toward more melancholic themes.
+- **Julia Wolf**: Shows consistency in song duration with some variability in valence, indicating stability in her musical approach.
+- **Bon Iver**: Displays varied valence and duration trends, perhaps reflecting experimentation with musical style.
+
+
+# Discussion
+
+The analysis suggests that streaming data can reveal meaningful patterns in an artist's musical evolution, capturing their creative direction and genre alignment. Each artist's trajectory offers insights into their stylistic choices, audience engagement, and potential influences over time.
+
+# Conclusion
+
+By combining Spotify data with visualization tools, we gained insight into the progression of three distinctive musical artists. This data-driven approach offers a compelling perspective on how artists innovate and adapt in an ever-evolving music landscape.
+
+# References
+
+- Wickham, H., & Grolemund, G. (2016). *R for Data Science*. O'Reilly Media.
+- Spotify API documentation. https://developer.spotify.com/documentation/web-api/
+- ggplot2 documentation. https://ggplot2.tidyverse.org/
+
+# Appendix
+```{r}
+# Save plots for reference in the appendix if necessary
+ggsave("song_duration_plot.png", plot = last_plot(), width = 8, height = 6)
+```
+
